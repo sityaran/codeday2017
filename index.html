@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<canvas id="AudioVisual" width="640" height="360" tabindex="0"></canvas> <!-- for visualizing audio -->
+<br>
+<input id="audio_file" type="file" accept="audio/*" /> <!-- for uploading audio -->
+<audio id="audio_player"></audio><!-- for playing audio -->
+
+<script>
+  var canvas
+  var canvasContext
+
+  var audioContext
+  var source
+  var sourceStream
+  var sourceBuffer
+  var analyser
+
+  var bufferLength
+  var dataArray
+
+  // loading stuff in on page load
+  window.onload = function () {
+    canvas = document.getElementById('AudioVisual')
+    canvas.focus()
+    canvasContext = canvas.getContext('2d')
+    audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    analyser = audioContext.createAnalyser()
+  }
+
+
+
+  // loads the sound into buffer when you upload
+  document.querySelector('input').onchange = function () {
+    var fileReader = new FileReader()
+    fileReader.onload = function () {
+      sourceBuffer = this.result
+      console.log("source buffer (from file read): ")
+      console.log(sourceBuffer)
+    }
+
+    fileReader.readAsArrayBuffer(this.files[0])
+
+    var url = URL.createObjectURL(this.files[0])
+    audio_player.src = url
+
+    audio_player.play()
+    var source = audioContext.createMediaElementSource(document.querySelector('audio'))
+    console.log("source: ")
+    console.log(source)
+
+    source.connect(analyser)
+    analyser.connect(audioContext.destination)
+
+    setupAnalyser()
+ }
+
+ function setupAnalyser () {
+   analyser.fftSize = 2048
+   bufferLength = analyser.frequencyBinCount
+   dataArray = new Uint8Array(bufferLength)
+
+   analyser.getByteTimeDomainData(dataArray)
+
+   canvasContext.clearRect(0, 0, canvas.width, canvas.height)
+
+   draw()
+ }
+
+ function draw () {
+   var drawVisual = requestAnimationFrame(draw)
+
+   analyser.getByteFrequencyData(dataArray)
+
+   canvasContext.fillStyle = 'rgb(0,0,0)'
+   canvasContext.fillRect(0, 0, canvas.width, canvas.height)
+
+   var barWidth = (canvas.width / bufferLength) * 2.5
+   var barHeight
+   var x = 0
+
+   for (var i = 0; i < bufferLength; i++) {
+     barHeight = dataArray[i] / 2
+     canvasContext.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50'
+     canvasContext.fillRect(x, canvas.height-barHeight/2, barWidth, barHeight)
+
+     x += barWidth + 1
+   }
+ }
+</script>
