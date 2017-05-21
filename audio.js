@@ -29,9 +29,9 @@ function setup() {
     canvas.focus()
     canvasContext = canvas.getContext('2d')
     
-    setInterval(update, 10)
+    setInterval(update, 100)
 }
-var max = 0
+
 function update() {
     analyser.getByteFrequencyData(dataArray)
     //drawColorCircles()
@@ -40,7 +40,6 @@ function update() {
 }
 
 function drawColorCircles () {
-    var drawVisual = requestAnimationFrame(drawColorCircles)
     analyser.getByteFrequencyData(dataArray)
 
     canvasContext.fillStyle = 'rgb(0,0,0)'
@@ -84,8 +83,6 @@ function drawColorCircles () {
 }
 
 function drawStandardVisual () {
-    var drawVisual = requestAnimationFrame(drawStandardVisual)
-
     analyser.getByteFrequencyData(dataArray)
 
     canvasContext.fillStyle = 'rgb(0,0,0)'
@@ -105,15 +102,10 @@ function drawStandardVisual () {
 }
 
 function drawBubbleVisual () {
-    var drawVisual = requestAnimationFrame(drawBubbleVisual)
-
     analyser.getByteFrequencyData(dataArray)
 
     canvasContext.fillStyle = 'rgb(0,0,0)'
     canvasContext.fillRect(0, 0, canvas.width, canvas.height)
-    var barWidth = (canvas.width / bufferLength)
-    var barHeight
-    var x = 0
 
     for (var i = 0; i < bufferLength; i+= 100) {
 
