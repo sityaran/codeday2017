@@ -29,14 +29,16 @@ function setup() {
     canvas.focus()
     canvasContext = canvas.getContext('2d')
     
-    setInterval(update, 100)
+    setInterval(update, 10)
 }
 
 function update() {
     analyser.getByteFrequencyData(dataArray)
     //drawColorCircles()
     //drawStandardVisual()
-    drawBubbleVisual()
+    //drawBubbleVisual()
+    draw2()
+    //draw1()
 }
 
 function drawColorCircles () {
@@ -142,4 +144,47 @@ function drawBubbleVisual () {
 //      canvasContext.stroke()
     }
 
+}
+
+function draw1 () {
+    var r = Math.min(dataArray[2], 200)
+    var g = Math.min(dataArray[4], 190)
+    var b = Math.min(dataArray[8], 180)
+    var avg = (r+g+b)/3
+    
+    canvasContext.fillStyle = 'rgb(' + (255-r) + ',' + (255-g) + ',' + (255 - b) + ')'
+    canvasContext.fillRect(0,0,canvas.width,canvas.height)
+    
+    canvasContext.beginPath()
+    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 2 / 250, 0, 2 * Math.PI, false);
+    canvasContext.fillStyle = 'rgb(' + (255-b) + ',' + r + ',' + (255-g) + ')'
+    canvasContext.fill()
+    canvasContext.closePath()
+    
+    canvasContext.beginPath()
+    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 4 / 250, 0, 2 * Math.PI, false);
+    canvasContext.fillStyle = 'rgb(' + r + ',' + (255 - b) + ',' + (255-g) + ')'
+    canvasContext.fill()
+    canvasContext.closePath()
+    
+    canvasContext.beginPath()
+    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 8 / 250, 0, 2 * Math.PI, false);
+    canvasContext.fillStyle = 'rgb(' + (255-g) + ',' + (255-b) + ',' + (255-r) + ')'
+    canvasContext.fill()
+    canvasContext.closePath()  
+}
+
+function draw2 () {
+    // draw bg
+    canvasContext.fillStyle = 'black'
+    canvasContext.fillRect(0,0,canvas.width,canvas.height)
+    for (var i = 0; i < bufferLength; i++) {       
+        // draw circle
+        canvasContext.beginPath()
+        canvasContext.arc(canvas.width/2, canvas.height/2, Math.sqrt(canvas.width*canvas.width + canvas.height*canvas.height) * (1 - i / bufferLength) / 2, 0, 2 * Math.PI, false);
+
+        canvasContext.fillStyle = 'rgba(' + (dataArray[i]) + ',' + (dataArray[bufferLength - i]) + ',' + (255 - dataArray[i]) + ',' + (1 - i/bufferLength) + ')'
+        canvasContext.fill()
+        canvasContext.closePath()  
+    }
 }
