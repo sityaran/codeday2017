@@ -52,8 +52,6 @@ function fileLoad () {
   var fileReader = new FileReader()
   fileReader.onload = function () {
     sourceBuffer = this.result
-    console.log("source buffer (from file read): ")
-    console.log(sourceBuffer)
   }
 
   fileReader.readAsArrayBuffer(this.files[0])
@@ -63,9 +61,7 @@ function fileLoad () {
 
   audio_player.play()
   var source = audioContext.createMediaElementSource(document.querySelector('audio'))
-  console.log("source: ")
-  console.log(source)
-
+  
   source.connect(analyser)
   analyser.connect(audioContext.destination)
 
