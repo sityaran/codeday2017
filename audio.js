@@ -16,9 +16,15 @@ window.onload = function () {
   canvas = document.getElementById('AudioVisual')
   canvas.focus()
   canvasContext = canvas.getContext('2d')
+
+  canvasContext.fillStyle = 'black'
+  canvasContext.fillRect(0,0,canvas.width,canvas.height)
+
   audioContext = new (window.AudioContext || window.webkitAudioContext)()
   analyser = audioContext.createAnalyser()
+
   if (useMic) {
+    hide(document.getElementById("audioControls"))
     micLoad();
   } else {
     document.querySelector('input').addEventListener('change', fileLoad)
@@ -67,7 +73,7 @@ function fileLoad () {
 }
 
 function setupAnalyser () {
- analyser.fftSize = canvas.width
+ analyser.fftSize = Math.pow(2, Math.floor(Math.log2(canvas.width)))
  bufferLength = analyser.frequencyBinCount
  dataArray = new Uint8Array(bufferLength)
 
@@ -99,6 +105,9 @@ function drawStandardVisual () {
  }
 }
 
-function draw() {
-
+function hide (elements) {
+  elements = elements.length ? elements : [elements];
+  for (var index = 0; index < elements.length; index++) {
+    elements[index].style.display = 'none';
+  }
 }
