@@ -111,7 +111,7 @@ analyser.getByteFrequencyData(dataArray)
   var barWidth = (canvas.width / bufferLength)
   var barHeight
 
-  for (var i = 0; i < bufferLength; i+= 10) {
+  for (var i = 0; i < bufferLength; i+= 15) {
       
     third = dataArray[bufferLength *  6/ 8] / 255 
       second = dataArray[bufferLength * 4 / 8] / 255
@@ -122,31 +122,31 @@ analyser.getByteFrequencyData(dataArray)
     canvasContext.fillStyle = 'rgb(' + 255* first + ',' + 255 * second + ',' + 255* third + ')'
       canvasContext.fillRect(0, 0, canvas.width, canvas.height)
       
-      canvasContext.strokeStyle = 'rgb(255,255,255)';
+//      canvasContext.strokeStyle = 'rgb(255,255,255)';
       
       canvasContext.beginPath();
       canvasContext.fillStyle = 'rgb(' + 255* second + ',' + 255 * first + ',' + 255* third + ')'
       canvasContext.arc(canvas.width / 2,canvas.height / 2 ,second * canvas.height + 300,0,2*Math.PI);
       canvasContext.fill();
-      canvasContext.stroke();
+//      canvasContext.stroke();
       
       canvasContext.beginPath();
       canvasContext.fillStyle = 'rgb(' + 255* third + ',' + 255 * first + ',' + 255* second + ')'
       canvasContext.arc(canvas.width / 2,canvas.height / 2 ,second * canvas.height + 200,0,2*Math.PI);
       canvasContext.fill();
-      canvasContext.stroke();
+//      canvasContext.stroke();
       
       canvasContext.beginPath();
       canvasContext.fillStyle = 'rgb(' + 255* second + ',' + 255 * third + ',' + 255* first + ')'
       canvasContext.arc(canvas.width / 2,canvas.height / 2 ,second * canvas.height + 100,0,2*Math.PI);
       canvasContext.fill();
-      canvasContext.stroke();
+//      canvasContext.stroke();
       
       canvasContext.beginPath();
       canvasContext.fillStyle = 'rgb(' + 255* third + ',' + 255 * second + ',' + 255* first + ')'
       canvasContext.arc(canvas.width / 2,canvas.height / 2,second * canvas.height,0,2*Math.PI);
       canvasContext.fill();
-      canvasContext.stroke();
+//      canvasContext.stroke()
       
   }
     
