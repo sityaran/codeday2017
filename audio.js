@@ -104,7 +104,13 @@ function setup() {
 
 // UPDATE
 function update() {
-    analyser.getByteFrequencyData(dataArray)
+    if (drawPick === 4) {
+        analyser.getByteTimeDomainData(dataArray)
+    } else {
+        analyser.getByteFrequencyData(dataArray)
+    }
+    
+    
     if (drawPick === 0) { // bar graph 
         drawStandardVisual()
     } else if (drawPick === 1) { // draw aesthetic speaker
@@ -116,7 +122,6 @@ function update() {
     } else if (drawPick === 4) { // draw wave form
         canvasContext.fillStyle = 'rgba(0,0,0,' + (Math.random() + .2) + ')'; 
         canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-        analyser.getByteTimeDomainData(dataArray);
         for (var i = 0; i < numOffsets; i++) {
             drawWave(randomOffsets[i])
         }
@@ -370,11 +375,11 @@ function drawSprioGraph() {
 
     var offset = Math.random() * 256
     
-    for (var i = 1; i < bufferLength; i *= 2) {
-        var step = .3
+    for (var i = 1; i < bufferLength; i++) {
+        var step = .1
         var R = 5
-        var r = 1.2
-        var a = dataArray[i] / 90
+        var r = 1.009
+        var a = 2
         var scale = 50;
         var t = 0;
         
@@ -384,13 +389,13 @@ function drawSprioGraph() {
             canvas.height/2 + scale*y(t, R, r, a)
         )
             
-        for (t = step; t <= 10 * 5 * 2 * Math.PI + step; t += step) {
+        for (t = step; t <= dataArray[i] / 16 * 5 * 2 * Math.PI + step; t += step) {
             canvasContext.lineTo(
                 canvas.width/2 + scale*x(t, R, r, a), 
                 canvas.height/2 + scale*y(t, R, r, a)
             )
         }
-        canvasContext.lineWidth = dataArray[i] / 32
+        canvasContext.lineWidth = 4
         
         var r = Math.floor( (dataArray[i] + offset ) % 256 )
         var g = Math.floor( (dataArray[bufferLength - i] + offset ) % 256 )
@@ -444,6 +449,8 @@ function claire() {
     function Circle(x, y, dx, dy, radius){
         this.x = x;
         this.y = y;
+        this.dx0 = dx
+        this.dy0 = dy
         this.dx = dx;
         this.dy = dy;
         this.radius = radius;
@@ -474,15 +481,23 @@ function claire() {
             this.radius = avg / 7;
 
             //interactivity
-            if (mouse.x - this.x < 50 && mouse.x - this.x > -50
-                && mouse.y - this.y < 50 && mouse.y - this.y > -50
-            ) {
-                if(this.radius < 40 &&
-                this.radius != 0){
+            if (mouse.x - this.x < 50 && mouse.x - this.x > -50 && mouse.y - this.y < 50 && mouse.y - this.y > -50) {
+                if(this.radius < 40 && this.radius != 0){
                     this.radius += dataArray[bufferLength / 2] / 5;
+                }
+                
+                if (this.dx != 0 && this.dy != 0) {
+                    this.dx0 = this.dx
+                    this.dy0 = this.dy
+                    this.dx = 0
+                    this.dy = 0
                 }
             }else if(this.radius > 2) {
                 this.radius -= 1;
+                if (this.dx === 0 && this.dy === 0) {
+                    this.dx = this.dx0
+                    this.dy = this.dy0
+                }
             }
 
             this.draw();
