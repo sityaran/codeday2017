@@ -8,7 +8,7 @@ var bufferLength = analyser.frequencyBinCount
 var canvas
 var canvasContext
 
-var drawPick = 5
+var drawPick = 4
 
 var randomOffsets = []
 var numOffsets = 50;
@@ -43,8 +43,8 @@ function setup() {
     canvasContext = canvas.getContext('2d')
     
     canvas.addEventListener('mousedown', function (e) {
-        drawPick = (drawPick + 1) % 7 
-        if (drawPick === 0 || drawPick === 5 || drawPick === 6) {
+        drawPick = (drawPick + 1) % 5
+        if (drawPick === 0 || drawPick === 4) {
             analyser.fftSize = 1024
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
@@ -69,17 +69,15 @@ function update() {
     } else if (drawPick === 3) {
        drawColorCircles()
     } else if (drawPick === 4) {
-       drawBubbleVisual() 
-    } else if (drawPick === 5) {
         canvasContext.fillStyle = 'rgb(0,0,0)'; 
         canvasContext.fillRect(0, 0, canvas.width, canvas.height);
         
         for (var i = 0; i < numOffsets; i++) {
-            analyser.getByteTimeDomainData(dataArray);
+            if (i % 5 == 0) {
+                analyser.getByteTimeDomainData(dataArray);
+            }
             drawWave(randomOffsets[i])
         }
-    } else if (drawPick === 6) {
-        drawMultiWave()
     }
 }
 
@@ -234,7 +232,7 @@ function draw2 () {
 
 function drawWave(offset) {    
 
-    canvasContext.lineWidth = 2;
+    canvasContext.lineWidth = 4;
     canvasContext.strokeStyle = 'rgba(255, 255, 255,' + .25 + ')';
 
     canvasContext.beginPath();
