@@ -1,12 +1,14 @@
 var source
 var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 var analyser = audioContext.createAnalyser()
-analyser.fftSize = 32
+analyser.fftSize = 1024
 var dataArray = new Uint8Array(analyser.fftSize)
 var bufferLength = analyser.frequencyBinCount
 
 var canvas
 var canvasContext
+
+var drawPick = 0
 
 window.onload = function () {
     navigator.getUserMedia(
@@ -25,20 +27,40 @@ window.onload = function () {
 
 function setup() {
     console.log("hi")
+    
     canvas = document.getElementById('canvas0')
     canvas.focus()
     canvasContext = canvas.getContext('2d')
+    
+    canvas.addEventListener('mousedown', function (e) {
+        drawPick = (drawPick + 1) % 5 
+        if (drawPick === 0) {
+            analyser.fftSize = 1024
+            dataArray = new Uint8Array(analyser.fftSize)
+            bufferLength = analyser.frequencyBinCount
+        } else {
+            analyser.fftSize = 32
+            dataArray = new Uint8Array(analyser.fftSize)
+            bufferLength = analyser.frequencyBinCount
+        }
+    })
     
     setInterval(update, 10)
 }
 
 function update() {
     analyser.getByteFrequencyData(dataArray)
-    //drawColorCircles()
-    //drawStandardVisual()
-    //drawBubbleVisual()
-    draw2()
-    //draw1()
+    if (drawPick === 0) {
+        drawStandardVisual()
+    } else if (drawPick === 1) {
+        draw1()
+    } else if (drawPick === 2) {
+        draw2()
+    } else if (drawPick === 3) {
+       drawColorCircles()
+    } else if (drawPick === 4) {
+       drawBubbleVisual() 
+    }
 }
 
 function drawColorCircles () {
@@ -94,7 +116,7 @@ function drawStandardVisual () {
     var x = 0
 
     for (var i = 0; i < bufferLength; i++) {
-        barHeight = dataArray[i] * canvas.height / 100
+        barHeight = dataArray[i] * canvas.height / 255
         intensity = dataArray[i] / 100
         canvasContext.fillStyle = 'rgb(' + 255*intensity + ',' + 50 + ',' + 255*(1-intensity)
         canvasContext.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
