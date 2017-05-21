@@ -65,7 +65,7 @@ function setup() {
     
     // listeners
     canvas.addEventListener('mousedown', function (e) {
-        drawPick = (drawPick + 1) % 10
+        drawPick = (drawPick + 1) % 11
         if (drawPick === 0 || drawPick === 4) {
             analyser.fftSize = maxFFT
             dataArray = new Uint8Array(analyser.fftSize)
@@ -145,6 +145,8 @@ function update() {
         drawSprioGraph()
     } else if (drawPick === 9) {
         claire()
+    } else if (drawPick === 10) {
+        blocks()
     }
 }
 
@@ -515,6 +517,31 @@ function claire() {
 
     animate();
 
+}
+
+function blocks() {
+    canvasContext.clearRect(0, 0, innerWidth, innerHeight);
+    third = dataArray[bufferLength * 7 / 8] / 255
+    first = dataArray[bufferLength * 4 / 8] / 255
+    second = dataArray[bufferLength * 1 / 8] / 255
+
+    var spacing = canvas.width / bufferLength;
+    var numY = canvas.height / spacing;
+    for (var j = 0; j < numY; j++) {
+        for (var i = bufferLength / 2; i > 0 ; i--) {
+            canvasContext.beginPath();
+            canvasContext.fillStyle = 'rgb(' + 255* first  + ',' + 255 * second + ',' + 255* third + ')'
+            canvasContext.arc((bufferLength / 2 + i) * spacing , j * spacing, dataArray[i] / 255 * 20 + 1, 0, 2 * Math.PI, false);
+            canvasContext.fill();
+        }
+        for (var i = 0; i <= bufferLength / 2; i++) {
+            canvasContext.beginPath();
+            canvasContext.fillStyle = 'rgb(' + 255* first + ',' + 255 * second + ',' + 255* third + ')'
+            canvasContext.arc(i * spacing , j * spacing, dataArray[bufferLength / 2 - i] / 255 * 20 + 1, 0, 2 * Math.PI, false);
+            canvasContext.fill();
+        }
+    }
+    canvasContext.fill();
 }
 
 // DRAWING OBJECTS
