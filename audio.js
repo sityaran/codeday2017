@@ -527,7 +527,7 @@ function blocks() {
 
     var spacing = canvas.width / bufferLength;
     var numY = canvas.height / spacing;
-    for (var j = 0; j < numY; j++) {
+    for (var j = 0; j <= numY; j++) {
         for (var i = bufferLength / 2; i > 0 ; i--) {
             canvasContext.beginPath();
             canvasContext.fillStyle = 'rgb(' + 255* first  + ',' + 255 * second + ',' + 255* third + ')'
