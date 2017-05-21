@@ -9,6 +9,7 @@ var analyser
 
 var bufferLength
 var dataArray
+var useMic = true;
 
 // loading stuff in on page load
 window.onload = function () {
@@ -17,10 +18,28 @@ window.onload = function () {
   canvasContext = canvas.getContext('2d')
   audioContext = new (window.AudioContext || window.webkitAudioContext)()
   analyser = audioContext.createAnalyser()
-  document.querySelector('input').addEventListener('change', fileLoad)
+  if (useMic) {
+    micLoad();
+  } else {
+    document.querySelector('input').addEventListener('change', fileLoad)
+  }
 }
 
+function micLoad () {
+    navigator.getUserMedia(
+          {"audio": true},
+           gotStream, function(e) {
+              alert('Error getting audio');
+              console.log(e);
+          });
 
+  function gotStream(stream) {
+    var source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser)
+      //analyser.connect(audioContext.destination)
+      setupAnalyser()
+  }
+}
 
 // loads the sound into buffer when you upload
 function fileLoad () {
