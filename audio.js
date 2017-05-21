@@ -1,7 +1,8 @@
 var source
 var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 var analyser = audioContext.createAnalyser()
-analyser.fftSize = 1024
+var maxFFT = 1024
+analyser.fftSize = maxFFT
 var dataArray = new Uint8Array(analyser.fftSize)
 var bufferLength = analyser.frequencyBinCount
 
@@ -11,8 +12,8 @@ var canvasContext
 var drawPick = 4
 
 var randomOffsets = []
-var numOffsets = 50;
-var offSetRange = 200;
+var numOffsets = 8;
+var offSetRange = 100;
 
 window.onload = function () {
     navigator.getUserMedia(
@@ -32,11 +33,9 @@ window.onload = function () {
         randomOffsets.push(Math.floor(Math.random() * (offSetRange + offSetRange)) - offSetRange)
     }
     
-    console.log(randomOffsets)
 }
 
 function setup() {
-    console.log("hi")
     
     canvas = document.getElementById('canvas0')
     canvas.focus()
@@ -45,7 +44,7 @@ function setup() {
     canvas.addEventListener('mousedown', function (e) {
         drawPick = (drawPick + 1) % 5
         if (drawPick === 0 || drawPick === 4) {
-            analyser.fftSize = 1024
+            analyser.fftSize = maxFFT
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
         } else {
@@ -69,13 +68,10 @@ function update() {
     } else if (drawPick === 3) {
        drawColorCircles()
     } else if (drawPick === 4) {
-        canvasContext.fillStyle = 'rgb(0,0,0)'; 
+        canvasContext.fillStyle = 'rgba(0,0,0,' + Math.random() + ')'; 
         canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-        
+        analyser.getByteTimeDomainData(dataArray);
         for (var i = 0; i < numOffsets; i++) {
-            if (i % 5 == 0) {
-                analyser.getByteTimeDomainData(dataArray);
-            }
             drawWave(randomOffsets[i])
         }
     }
@@ -127,15 +123,15 @@ function drawColorCircles () {
 function drawStandardVisual () {
     analyser.getByteFrequencyData(dataArray)
 
-    canvasContext.fillStyle = 'rgb(0,0,0)'
+    canvasContext.fillStyle = 'rgba(0,0,0, .1)'
     canvasContext.fillRect(0, 0, canvas.width, canvas.height)
-    var barWidth = (canvas.width / bufferLength)
+    var barWidth = 1.5 * (canvas.width / bufferLength)
     var barHeight
     var x = 0
 
     for (var i = 0; i < bufferLength; i++) {
         barHeight = dataArray[i] * canvas.height / 255
-        intensity = dataArray[i] / 100
+        intensity = dataArray[i] / 200
         canvasContext.fillStyle = 'rgb(' + 255*intensity + ',' + 50 + ',' + 255*(1-intensity)
         canvasContext.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
 
@@ -233,7 +229,7 @@ function draw2 () {
 function drawWave(offset) {    
 
     canvasContext.lineWidth = 4;
-    canvasContext.strokeStyle = 'rgba(255, 255, 255,' + .25 + ')';
+    canvasContext.strokeStyle = 'rgba(255, 255, 255,' + .5 + ')';
 
     canvasContext.beginPath();
 
