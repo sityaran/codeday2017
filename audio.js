@@ -8,7 +8,11 @@ var bufferLength = analyser.frequencyBinCount
 var canvas
 var canvasContext
 
-var drawPick = 0
+var drawPick = 5
+
+var randomOffsets = []
+var numOffsets = 50;
+var offSetRange = 200;
 
 window.onload = function () {
     navigator.getUserMedia(
@@ -23,6 +27,12 @@ window.onload = function () {
             console.log(e); 
         }
     );
+    
+    for (var i = 0; i < numOffsets; i++) {
+        randomOffsets.push(Math.floor(Math.random() * (offSetRange + offSetRange)) - offSetRange)
+    }
+    
+    console.log(randomOffsets)
 }
 
 function setup() {
@@ -33,8 +43,8 @@ function setup() {
     canvasContext = canvas.getContext('2d')
     
     canvas.addEventListener('mousedown', function (e) {
-        drawPick = (drawPick + 1) % 5 
-        if (drawPick === 0) {
+        drawPick = (drawPick + 1) % 7 
+        if (drawPick === 0 || drawPick === 5 || drawPick === 6) {
             analyser.fftSize = 1024
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
@@ -60,6 +70,16 @@ function update() {
        drawColorCircles()
     } else if (drawPick === 4) {
        drawBubbleVisual() 
+    } else if (drawPick === 5) {
+        canvasContext.fillStyle = 'rgb(0,0,0)'; 
+        canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (var i = 0; i < numOffsets; i++) {
+            analyser.getByteTimeDomainData(dataArray);
+            drawWave(randomOffsets[i])
+        }
+    } else if (drawPick === 6) {
+        drawMultiWave()
     }
 }
 
@@ -209,4 +229,39 @@ function draw2 () {
         canvasContext.fill()
         canvasContext.closePath()  
     }
+}
+
+
+function drawWave(offset) {    
+
+    canvasContext.lineWidth = 2;
+    canvasContext.strokeStyle = 'rgba(255, 255, 255,' + .25 + ')';
+
+    canvasContext.beginPath();
+
+    var sliceWidth = canvas.width / bufferLength;
+    var x = 0;
+    
+    
+    for(var i = 0; i < bufferLength; i++) {
+
+        var v = (dataArray[i] - 128.0) / 128;
+        var y = v * 100 + canvas.height / 2;
+        
+        if(i === 0) {
+            canvasContext.moveTo(x, y + offset);
+        } else {
+            canvasContext.lineTo(x, y + offset);
+        }
+
+        x += sliceWidth;
+    }
+
+    canvasContext.lineTo(canvas.width, canvas.height/2 + offset);
+    canvasContext.stroke();
+    canvasContext.closePath();
+}
+
+function drawMultiWave() {
+    
 }
