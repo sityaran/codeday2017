@@ -15,6 +15,13 @@ var randomOffsets = []
 var numOffsets = 8;
 var offSetRange = 100;
 
+var mouseX
+var mouseY
+
+var musicObjs = []
+
+// SETUP
+
 window.onload = function () {
     navigator.getUserMedia(
         {"audio": true},
@@ -41,8 +48,18 @@ function setup() {
     canvas.focus()
     canvasContext = canvas.getContext('2d')
     
+    canvasContext.canvas.width  = window.innerWidth;
+    canvasContext.canvas.height = window.innerHeight;
+    
+    // for future resize
+    window.onresize = function () {
+        canvasContext.canvas.width  = window.innerWidth;
+        canvasContext.canvas.height = window.innerHeight;
+    }
+    
+    // listeners
     canvas.addEventListener('mousedown', function (e) {
-        drawPick = (drawPick + 1) % 5
+        drawPick = (drawPick + 1) % 6
         if (drawPick === 0 || drawPick === 4) {
             analyser.fftSize = maxFFT
             dataArray = new Uint8Array(analyser.fftSize)
@@ -52,10 +69,26 @@ function setup() {
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
         }
+       
     })
+    
+    canvas.addEventListener('mousemove', function (e) {
+        if (e.key = ' ') {
+            mouseX = e.clientX
+            mouseY = e.clientY  
+        }
+    })
+    
+    canvas.addEventListener('keydown', function (e) { 
+        musicObjs.push(new Circle(mouseX, mouseY, Math.random() * 50 + 25, Math.random() * 302))
+    })
+    
     
     setInterval(update, 10)
 }
+
+
+// UPDATE
 
 function update() {
     analyser.getByteFrequencyData(dataArray)
@@ -74,8 +107,17 @@ function update() {
         for (var i = 0; i < numOffsets; i++) {
             drawWave(randomOffsets[i])
         }
+    } else if (drawPick === 5) {
+        canvasContext.fillStyle = 'rgb(0,0,0)'
+        canvasContext.fillRect(0,0,canvas.width,canvas.height)
+        analyser.getByteFrequencyData(dataArray)
+        for (var obj of musicObjs) {
+            obj.draw()
+        }
     }
 }
+
+// DRAWING FUNCTIONS
 
 function drawColorCircles () {
     analyser.getByteFrequencyData(dataArray)
@@ -183,28 +225,28 @@ function drawBubbleVisual () {
 }
 
 function draw1 () {
-    var r = Math.min(dataArray[2], 200)
-    var g = Math.min(dataArray[4], 190)
-    var b = Math.min(dataArray[8], 180)
+    var r = dataArray[2] - 10
+    var g = dataArray[4] - 20
+    var b = dataArray[8] - 30
     var avg = (r+g+b)/3
     
     canvasContext.fillStyle = 'rgb(' + (255-r) + ',' + (255-g) + ',' + (255 - b) + ')'
     canvasContext.fillRect(0,0,canvas.width,canvas.height)
     
     canvasContext.beginPath()
-    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 2 / 250, 0, 2 * Math.PI, false);
+    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 2 / 255, 0, 2 * Math.PI, false);
     canvasContext.fillStyle = 'rgb(' + (255-b) + ',' + r + ',' + (255-g) + ')'
     canvasContext.fill()
     canvasContext.closePath()
     
     canvasContext.beginPath()
-    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 4 / 250, 0, 2 * Math.PI, false);
+    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 4 / 255, 0, 2 * Math.PI, false);
     canvasContext.fillStyle = 'rgb(' + r + ',' + (255 - b) + ',' + (255-g) + ')'
     canvasContext.fill()
     canvasContext.closePath()
     
     canvasContext.beginPath()
-    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 8 / 250, 0, 2 * Math.PI, false);
+    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 8 / 255, 0, 2 * Math.PI, false);
     canvasContext.fillStyle = 'rgb(' + (255-g) + ',' + (255-b) + ',' + (255-r) + ')'
     canvasContext.fill()
     canvasContext.closePath()  
@@ -256,6 +298,29 @@ function drawWave(offset) {
     canvasContext.closePath();
 }
 
-function drawMultiWave() {
+
+// DRAWING OBJECTS
+function Circle(posX, posY, radius, offset) {
+    this.maxRad = radius
+    this.x = posX
+    this.y = posY
+    this.offset = offset
     
+    this.draw = function () {
+        for (var i = 1; i < bufferLength; i*=2) {              
+            // draw circle
+            canvasContext.beginPath()
+            canvasContext.arc(this.x, this.y, dataArray[i] / 255 * this.maxRad, 0, 2 * Math.PI, false);
+            
+            var r = Math.floor( (dataArray[i] + this.offset ) % 256 )
+            var g = Math.floor( (dataArray[bufferLength - i] + this.offset ) % 256 )
+            var b = Math.floor( ((255 - dataArray[i]) + this.offset ) % 256 )
+            
+            
+            canvasContext.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + (1 - i/bufferLength) + ')'
+            canvasContext.fill()
+            canvasContext.closePath()  
+        }
+    }
 }
+
