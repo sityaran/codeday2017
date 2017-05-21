@@ -52,6 +52,8 @@ function setup() {
     canvas.focus()
     canvasContext = canvas.getContext('2d')
     
+    canvasContext.imageSmoothingEnabled = false
+
     canvasContext.canvas.width  = window.innerWidth;
     canvasContext.canvas.height = window.innerHeight;
     
@@ -69,11 +71,11 @@ function setup() {
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
         } else if (drawPick === 7) {
-            analyser.fftSize = 32
+            analyser.fftSize = 64
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
         } else {
-            analyser.fftSize = 32
+            analyser.fftSize = 64
             dataArray = new Uint8Array(analyser.fftSize)
             bufferLength = analyser.frequencyBinCount
         }
@@ -261,23 +263,18 @@ function draw1 () {
     canvasContext.fillStyle = 'rgb(' + (255-r) + ',' + (255-g) + ',' + (255 - b) + ')'
     canvasContext.fillRect(0,0,canvas.width,canvas.height)
     
-    canvasContext.beginPath()
-    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 2 / 255, 0, 2 * Math.PI, false);
+    var radi0 = canvas.width * avg / 255 / 4
+    var radi1 = radi0 / 2
+    var radi2 = radi1/ 2
+    
     canvasContext.fillStyle = 'rgb(' + (255-b) + ',' + r + ',' + (255-g) + ')'
-    canvasContext.fill()
-    canvasContext.closePath()
+    canvasContext.fillRect(canvas.width/2 - radi0, canvas.height/2 - radi0, radi0*2, radi0*2)
     
-    canvasContext.beginPath()
-    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 4 / 255, 0, 2 * Math.PI, false);
-    canvasContext.fillStyle = 'rgb(' + r + ',' + (255 - b) + ',' + (255-g) + ')'
-    canvasContext.fill()
-    canvasContext.closePath()
+    canvasContext.fillStyle = 'rgb(' + r + ',' + (255 - b) + ',' + (255 - b) + ')'
+    canvasContext.fillRect(canvas.width/2 - radi1, canvas.height/2 - radi1, radi1*2, radi1*2)
     
-    canvasContext.beginPath()
-    canvasContext.arc(canvas.width/2, canvas.height/2, canvas.width * avg / 8 / 255, 0, 2 * Math.PI, false);
     canvasContext.fillStyle = 'rgb(' + (255-g) + ',' + (255-b) + ',' + (255-r) + ')'
-    canvasContext.fill()
-    canvasContext.closePath()  
+    canvasContext.fillRect(canvas.width/2 - radi2, canvas.height/2 - radi2, radi2*2, radi2*2)
 }
 
 function draw2 () {
