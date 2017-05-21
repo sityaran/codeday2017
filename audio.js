@@ -85,24 +85,24 @@ function setupAnalyser () {
 }
 
 function drawStandardVisual () {
- var drawVisual = requestAnimationFrame(drawStandardVisual)
+  var drawVisual = requestAnimationFrame(drawStandardVisual)
 
- analyser.getByteFrequencyData(dataArray)
+  analyser.getByteFrequencyData(dataArray)
 
- canvasContext.fillStyle = 'rgb(0,0,0)'
- canvasContext.fillRect(0, 0, canvas.width, canvas.height)
- var barWidth = (canvas.width / bufferLength)
- var barHeight
- var x = 0
+  canvasContext.fillStyle = 'rgb(0,0,0)'
+  canvasContext.fillRect(0, 0, canvas.width, canvas.height)
+  var barWidth = (canvas.width / bufferLength)
+  var barHeight
+  var x = 0
 
- for (var i = 0; i < bufferLength; i++) {
-   barHeight = dataArray[i] * canvas.height / 255
-   intensity = dataArray[i] / 255
-   canvasContext.fillStyle = 'rgb(' + 255*intensity + ',' + 50 + ',' + 255*(1-intensity)
-   canvasContext.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
+  for (var i = 0; i < bufferLength; i++) {
+    barHeight = dataArray[i] * canvas.height / 255
+    intensity = dataArray[i] / 255
+    canvasContext.fillStyle = 'rgb(' + 255*intensity + ',' + 50 + ',' + 255*(1-intensity)
+    canvasContext.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
 
-   x += barWidth
- }
+    x += barWidth
+  }
 }
 
 function hide (elements) {
