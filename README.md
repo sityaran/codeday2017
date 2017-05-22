@@ -11,7 +11,7 @@ Audio visualization written in JavaScript using Web Audio API for CodeDay Seattl
 
 ## Site : https://sityaran.github.io/codeday2017/
 
-## Video Demo : https://youtu.be/hIT1uOCDJGY?list=FLMijtxc485jzhiUNbX2CnRQ
+## Video Demo : https://youtu.be/hIT1uOCDJGY
 
 ## To use 
 1. Accept microphone usage, allow it to use the default recording/input device! And then changed the input device as needed to get the desired audio source.
