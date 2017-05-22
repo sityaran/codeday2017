@@ -27,12 +27,12 @@ var mouseY;
 // for maintaining those instantiated visuals
 var musicObjs = [];
 var triangleMusicObjs = [];
+var circleArray;
 
 // SETUP
 window.onload = function () {
   // get web audio context, setup necessary nodes and constants
-  windowAudioContext = window.AudioContext() || window.webkitAudioContext;
-  audioContext = new windowAudioContext();
+  audioContext = new window.AudioContext() || window.webkitAudioContext;
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 32;
   dataArray = new Uint8Array(analyser.fftSize);
@@ -64,8 +64,8 @@ function setup() {
 
   // for future resize
   window.onresize = function () {
-      canvasContext.canvas.width  = window.innerWidth;
-      canvasContext.canvas.height = window.innerHeight;
+    canvasContext.canvas.width  = window.innerWidth;
+    canvasContext.canvas.height = window.innerHeight;
   };
 
   // listeners
@@ -89,13 +89,19 @@ function setup() {
 
   canvas.addEventListener('keydown', function (e) {
     if (drawPick === 5) {
-        musicObjs.push(new Circle(mouseX, mouseY, Math.random() * 50 + 25, Math.random() * 302));
+      musicObjs.push(new Circle(mouseX, mouseY, Math.random() * 50 + 25, Math.random() * 302));
     } else if (drawPick === 6) {
-        var tri = new Triangle(mouseX, mouseY, Math.random() * 50 + 25, Math.random() * 302);
-        tri.generate();
-        triangleMusicObjs.push(tri);
+      var tri = new Triangle(mouseX, mouseY, Math.random() * 50 + 25, Math.random() * 302);
+      tri.generate();
+      triangleMusicObjs.push(tri);
     }
   });
+
+  // setup random offsets for wave function
+  randomOffsets = [];
+  for (i = 0; i < numOffsets; i++) {
+    randomOffsets.push(Math.floor(Math.random() * (offSetRange + offSetRange)) - offSetRange);
+  }
 
   setInterval(update, 10);
 }
@@ -104,9 +110,9 @@ function setup() {
 function update() {
   // determine the type of data to use
   if (drawPick === 4) {
-      analyser.getByteTimeDomainData(dataArray);
+    analyser.getByteTimeDomainData(dataArray);
   } else {
-      analyser.getByteFrequencyData(dataArray);
+    analyser.getByteFrequencyData(dataArray);
   }
 
   // determine which visual to use
@@ -200,7 +206,7 @@ function drawStandardVisual () {
   canvasContext.fillStyle = 'rgba(0,0,0, .1)';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
-  var barWidth = 1.2 * (canvas.width / bufferLength);
+  var barWidth = (canvas.width / bufferLength);
   var barHeight;
   var x = 0;
 
@@ -253,11 +259,6 @@ function draw2 () {
 function drawMultiWave() {
   canvasContext.fillStyle = 'rgba(0,0,0,' + (Math.random() + 0.2) + ')';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-  // setup random offsets for wave function
-  randomOffsets = [];
-  for (i = 0; i < numOffsets; i++) {
-    randomOffsets.push(Math.floor(Math.random() * (offSetRange + offSetRange)) - offSetRange);
-  }
   // draw waves for each offset
   for (i = 0; i < numOffsets; i++) {
     drawWave(randomOffsets[i]);
@@ -352,7 +353,7 @@ function drawSprioGraph() {
     canvasContext.moveTo(canvas.width/2 + scale*x(t, R, r, a), canvas.height/2 + scale*y(t, R, r, a));
 
     for (t = step; t <= dataArray[i] / 16 * 5 * 2 * Math.PI + step; t += step) {
-      canvasContext.moveTo(canvas.width/2 + scale*x(t, R, r, a), canvas.height/2 + scale*y(t, R, r, a));
+      canvasContext.lineTo(canvas.width/2 + scale*x(t, R, r, a), canvas.height/2 + scale*y(t, R, r, a));
     }
     canvasContext.lineWidth = 4;
 
@@ -369,15 +370,17 @@ function drawSprioGraph() {
 
 //interactive visual
 function claire() {
-  var circleArray = [];
-  for (var i = 0; i < bufferLength; i++) {
-    var radius = dataArray[i];
-    var myColor = getRandomColor();
-    var x = Math.random() * (innerWidth - (radius * 2)) + radius;
-    var y = Math.random() * (innerHeight - (radius * 2)) + radius;
-    var dx = (Math.random() - 0.5);
-    var dy = (Math.random() - 0.5);
-    circleArray.push(new Circle(x, y, dx, dy, radius));
+  if (!circleArray) {
+    circleArray = [];
+    for (var i = 0; i < bufferLength; i++) {
+      var radius = dataArray[i];
+      var myColor = getRandomColor();
+      var x = Math.random() * (innerWidth - (radius * 2)) + radius;
+      var y = Math.random() * (innerHeight - (radius * 2)) + radius;
+      var dx = (Math.random() - 0.5);
+      var dy = (Math.random() - 0.5);
+      circleArray.push(new Circle(x, y, dx, dy, radius));
+    }
   }
 
   function getRandomColor() {
@@ -410,35 +413,35 @@ function claire() {
       var avg = (dataArray[0] + dataArray[bufferLength / 2] + dataArray[bufferLength - 5]) / 3;
       //change direction upon horizontal impact
       if(this.x + this.radius > innerWidth ||
-          this.x - this.radius < 0){
-          this.dx = -this.dx;
+        this.x - this.radius < 0){
+        this.dx = -this.dx;
       }
       //change direction upon vertical impact
       if(this.y + this.radius > innerHeight ||
-          this.y - this.radius < 0){
-          this.dy = -this.dy;
+        this.y - this.radius < 0){
+        this.dy = -this.dy;
       }
       this.x += this.dx * avg / 20;
       this.y += this.dy * avg / 20;
       this.radius = avg / 7;
 
       //interactivity
-      if (mouse.x - this.x < 50 && mouse.x - this.x > -50 && mouse.y - this.y < 50 && mouse.y - this.y > -50) {
-          if(this.radius < 40 && this.radius !== 0){
-              this.radius += dataArray[bufferLength / 2] / 5;
-          }
-          if (this.dx !== 0 && this.dy !== 0) {
-              this.dx0 = this.dx;
-              this.dy0 = this.dy;
-              this.dx = 0;
-              this.dy = 0;
-          }
+      if (mouseX - this.x < 50 && mouseX - this.x > -50 && mouseY - this.y < 50 && mouseY - this.y > -50) {
+        if(this.radius < 40 && this.radius !== 0){
+          this.radius += dataArray[bufferLength / 2] / 5;
+        }
+        if (this.dx !== 0 && this.dy !== 0) {
+          this.dx0 = this.dx;
+          this.dy0 = this.dy;
+          this.dx = 0;
+          this.dy = 0;
+        }
       } else if(this.radius > 2) {
-          this.radius -= 1;
-          if (this.dx === 0 && this.dy === 0) {
-              this.dx = this.dx0;
-              this.dy = this.dy0;
-          }
+        this.radius -= 1;
+        if (this.dx === 0 && this.dy === 0) {
+          this.dx = this.dx0;
+          this.dy = this.dy0;
+        }
       }
 
       this.draw();
