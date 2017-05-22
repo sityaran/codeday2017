@@ -47,12 +47,9 @@ window.onload = function () {
 }
 
 function setup() {
-    
     canvas = document.getElementById('canvas0')
     canvas.focus()
     canvasContext = canvas.getContext('2d')
-    
-    canvasContext.imageSmoothingEnabled = false
 
     canvasContext.canvas.width  = window.innerWidth;
     canvasContext.canvas.height = window.innerHeight;
