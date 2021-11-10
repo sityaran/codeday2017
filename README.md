@@ -4,12 +4,12 @@ Audio visualization written in JavaScript using Web Audio API for CodeDay Seattl
 ## Authors
 ### Thipok Cholsaipant @thipokch
 ### Claire Kantner @ckantner (gitlabs) 
-### Tenma Rollins @sityaran
+### Tenma Rollins @tenmar
 ### Collin Crow @Cromalin (gitlabs) 
 ### Mobius  
 * Most of the code was commited from my computer due to our team's overall lack of experience with handling merge conflicts, but all these wonderful people helped make this application!
 
-## Site : https://sityaran.github.io/codeday2017/
+## Site : https://tenmar.github.io/codeday2017/
 
 ## Video Demo : https://youtu.be/hIT1uOCDJGY
 
